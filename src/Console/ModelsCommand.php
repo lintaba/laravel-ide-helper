@@ -213,18 +213,19 @@ class ModelsCommand extends Command
                     $reflectionClass = new ReflectionClass($name);
 
                     if (!$reflectionClass->isSubclassOf('Illuminate\Database\Eloquent\Model')) {
+                        $this->comment("Ignoring non-model '$name'", OutputInterface::VERBOSITY_VERBOSE);
+                        continue;
+                    }
+
+                    if (!$reflectionClass->IsInstantiable()) {
+                        $this->comment("Ignoring abstract class or interface '$name'", OutputInterface::VERBOSITY_VERBOSE);
                         continue;
                     }
 
                     if ($this->output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                         $this->comment("Loading model '$name'");
                     }
-
-                    if (!$reflectionClass->IsInstantiable()) {
-                        // ignore abstract class or interface
-                        continue;
-                    }
-
+                    
                     $model = $this->laravel->make($name);
 
                     if ($hasDoctrine) {
